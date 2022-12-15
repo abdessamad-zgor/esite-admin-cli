@@ -1,12 +1,14 @@
 #!/bin/bash
 
+basetemp="/home/abdessamadz/work/portfolio/esite/admin-cli/templates/base/**"
 
 mkdir ${1// /-}
 cd ${1// /-}
 git init
 gh repo create hornedout-law/${1// /-} --public
-echo "{\"1\": $1 }">log.json
+echo "{\"title\": $1 }">log.json
 echo "/node_modules">.gitignore
+cp $basetemp .
 git add .
 git commit -m "first log commit"
 git branch -M main
