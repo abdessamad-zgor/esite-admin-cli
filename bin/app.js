@@ -1792,17 +1792,31 @@ var import_node_child_process = require("child_process");
 var import_node_path = __toESM(require("path"));
 var program2 = new Command("esite");
 program2.name("esite").description("a CLI tool to create and manage logs for the esite client").version("0.0.1");
-program2.command("create").description("Create a new log").argument("<title>", "name of the blog").action((title) => {
-  let script = (0, import_node_child_process.exec)(
-    `sh ${import_node_path.default.resolve(__dirname, "../scripts/create.sh")} ${title}`,
-    (error, stdout, stderr) => {
-      console.log(stdout);
-      console.log(stderr);
-      if (error !== null) {
-        console.log(`exec error: ${error}`);
-      }
-    }
+program2.command("create").description("Create a new log").argument("<title>", "name of the log").option("-w, --with [deps]", "add project dependencies").action((title, options) => {
+  let failed = false;
+  console.log(title);
+  let script = (0, import_node_child_process.spawn)(`${import_node_path.default.resolve(__dirname, "../scripts/create.sh")}`, [
+    title
+  ]);
+  script.stdout.on(
+    "data",
+    (chunk) => console.log(chunk.toString())
   );
-  script.on("close", () => script.kill(1));
+  script.stderr.on("data", (chunk) => {
+    failed = true;
+    console.log(chunk.toString());
+  });
+});
+program2.command("remove").description("remove the specified log").argument("<dirname>", "directory of the log").action((dirname) => {
+  let script = (0, import_node_child_process.spawn)(`${import_node_path.default.resolve(__dirname, "../scripts/delete.sh")}`, [
+    dirname
+  ]);
+  script.stdout.on(
+    "data",
+    (chunk) => console.log(chunk.toString())
+  );
+  script.stderr.on("data", (chunk) => {
+    console.log(chunk.toString());
+  });
 });
 program2.parse();
